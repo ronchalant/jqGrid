@@ -649,6 +649,7 @@ $.fn.jqGrid = function( pin ) {
 			onRightClickRow: null,
 			onPaging: null,
 			onSelectAll: null,
+			onSortComplete: null,
 			loadComplete: null,
 			gridComplete: null,
 			loadError: null,
@@ -1539,6 +1540,16 @@ $.fn.jqGrid = function( pin ) {
 			page = parseInt(ts.p.page,10),
 			totalpages = Math.ceil(total / recordsperpage),
 			retresult = {};
+			
+			// before slicing, pass the full list of IDs to an event if
+			// available...
+			if ($.isFunction(ts.p.onSortComplete)) {
+				var ids = [];
+				$.each(queryResults, function() { ids.push(this[ts.p.localReader.id]); });
+				try { ts.p.onSortComplete.call(ts, ids); }
+				catch (e) { }
+			}
+			
 			queryResults = queryResults.slice( (page-1)*recordsperpage , page*recordsperpage );
 			query = null;
 			cmtypes = null;
